@@ -15,13 +15,19 @@
 (function($) {
   
     var defaults = {
+        //Ajax options
         ajaxOptions: null,
+        //A boolean function that prevents the values from being toggled based on ajax data
+        ajaxPreventToggle: null,
+        //Allows user to submit empty values
+        ajaxSubmitNone: true,
+        //animation for show/hide
         animation : null,
         buttonClass: "",
         valueClass: "",
         buttonText: "edit",
         clickListener : null,
-        startValue: "" 
+        nullText: "None" 
     }
 
 
@@ -49,13 +55,42 @@
             var html_string = "<span class='" + options.valueClass +"' id=>";
             html_string += element.val();            
             html_string += "</span>";
-            $(html_string).insertBefore(element);
+            if(element.val() != ''){
+                element.hide();    
+                $(html_string).insertBefore(element);
+            }
+            else{
+                $(html_string).insertBefore(element).hide();
+            }
         }
         function toggle(element){
+            //TODO: keep the value if there was a failure in sending ajax
             if(element.is(":visible")){
+                //Empty values
+                if(options.ajaxOptions){
+                    var ajaxOptions = options.ajaxOptions;
+                    var name = element.attr("name");
+                    ajaxOptions["data"] = { name : element.val()};
+                    var xhr = $.ajax(ajaxOptions);
+
+                    //prevents the toggle if we can't send via ajax or some other option
+                    if(xhr.statusTest != "success"){
+                        return;
+                    }
+                    if(options.ajaxPreventToggle && !options.ajaxPreventToggle(xhr.responseText)){
+                        return
+                    }
+                }
                 element.hide();
-                element.prev().text(element.val());
+                
+                if($.trim(element.val()) == ''){
+                    element.prev().text(options.nullText);
+                }
+                else{
+                    element.prev().text(element.val());
+                }
                 element.prev().show();
+               
             }
             else{
                 element.show();
@@ -66,17 +101,11 @@
             var object = $(this);
             var button = add_button(object);
             add_value(object);
-            if(!options.ajaxOptions){
-                button.click(function(e){
-                    e.preventDefault(); 
-                    toggle(object)
-                }); 
-                return;
-            }
-            //TODO: add ajax support
-            var ajaxOptions = {
-                
-            }
+            button.click(function(e){
+                e.preventDefault(); 
+                toggle(object)
+            }); 
+            return;
        });
     };
 })(jQuery);
