@@ -33,6 +33,7 @@
 
     $.fn.toggleForms = function(options){
         var options = $.extend(defaults, options);
+        var ajaxOptions = options.ajaxOptions;
 
         function add_button(element){
             //Add a button right after the identifier
@@ -67,8 +68,7 @@
             //TODO: keep the value if there was a failure in sending ajax
             if(element.is(":visible")){
                 //Empty values
-                if(options.ajaxOptions){
-                    var ajaxOptions = options.ajaxOptions;
+                if(ajaxOptions != null){
                     var name = element.attr("name");
                     ajaxOptions["data"] = { name : element.val()};
                     var xhr = $.ajax(ajaxOptions);
