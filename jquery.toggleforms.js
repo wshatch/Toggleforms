@@ -72,9 +72,8 @@
                     var name = element.attr("name");
                     ajaxOptions["data"] = { name : element.val()};
                     var xhr = $.ajax(ajaxOptions);
-
                     //prevents the toggle if we can't send via ajax or some other option
-                    if(xhr.statusTest != "success"){
+                    if(xhr.statusText != "OK"){
                         return;
                     }
                     if(options.ajaxPreventToggle && !options.ajaxPreventToggle(xhr.responseText)){
