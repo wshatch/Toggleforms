@@ -67,21 +67,6 @@
             //TODO: keep the value if there was a failure in sending ajax
             if(element.is(":visible")){
                 //Empty values
-                if(ajaxOptions != null){
-                    var name = element.attr("name");
-                    ajaxOptions["data"] = { name : element.val()};
-                    //We change the success function so that we check for success when it's ready
-                    var oldSuccess= ajaxOptions["success"]
-                    var ok = false;
-                    ajaxOptions["success"] = function(){ ok= true; oldSuccess();}; 
-                    var xhr = $.ajax(ajaxOptions);
-                    if(!ok){
-                        return;
-                    }
-                    if(options.ajaxPreventToggle != null && !options.ajaxPreventToggle(xhr.responseText)){
-                        return
-                    }
-                }
                 element.hide();
                 
                 if($.trim(element.val()) == ''){
@@ -104,7 +89,18 @@
             add_value(object);
             button.click(function(e){
                 e.preventDefault(); 
-                toggle(object)
+                //Ajax sender
+                if(ajaxOptions != null){
+                    var name = object.attr("name");
+                    ajaxOptions["data"] = { name : object.val()};
+                    var oldSuccess= ajaxOptions["success"]
+                    ajaxOptions["success"] = function(){toggle(object); oldSuccess();}; 
+                    if(object.is(":visible")){
+                        var xhr = $.ajax(ajaxOptions);
+                        return;
+                    }
+                }
+                toggle(object);
             }); 
             return;
        });
