@@ -70,13 +70,12 @@
                 if(ajaxOptions != null){
                     var name = element.attr("name");
                     ajaxOptions["data"] = { name : element.val()};
+                    //We change the success function so that we check for success when it's ready
+                    var oldSuccess= ajaxOptions["success"]
+                    var ok = false;
+                    ajaxOptions["success"] = function(){ ok= true; oldSuccess();}; 
                     var xhr = $.ajax(ajaxOptions);
-                    //Some weird bug is prevented by evaulating the xhr status here
-                    //Divide by 100 to allow all 200 status codes
-                    var xhrStatus = xhr["status"] ;
-                    xhrStatus = xhrStatus / 100;
-                    //prevents the toggle if we can't send via ajax or some other option
-                    if(xhrStatus != 2){
+                    if(!ok){
                         return;
                     }
                     if(options.ajaxPreventToggle != null && !options.ajaxPreventToggle(xhr.responseText)){
