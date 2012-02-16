@@ -11,7 +11,6 @@
 
     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
-
 (function($) {
   
     var defaults = {
@@ -72,11 +71,15 @@
                     var name = element.attr("name");
                     ajaxOptions["data"] = { name : element.val()};
                     var xhr = $.ajax(ajaxOptions);
+                    //Some weird bug is prevented by evaulating the xhr status here
+                    //Divide by 100 to allow all 200 status codes
+                    var xhrStatus = xhr["status"] ;
+                    xhrStatus = xhrStatus / 100;
                     //prevents the toggle if we can't send via ajax or some other option
-                    if(xhr.statusText != "OK"){
+                    if(xhrStatus != 2){
                         return;
                     }
-                    if(options.ajaxPreventToggle && !options.ajaxPreventToggle(xhr.responseText)){
+                    if(options.ajaxPreventToggle != null && !options.ajaxPreventToggle(xhr.responseText)){
                         return
                     }
                 }
